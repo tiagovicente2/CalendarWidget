@@ -1,8 +1,8 @@
 plugins {
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.jetbrainsKotlinAndroid)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.kapt)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -37,6 +37,10 @@ android {
     }
     buildFeatures {
         viewBinding = true
+    }
+    // Disable deprecated features
+    lint {
+        disable += "OldTargetApi"
     }
 }
 
