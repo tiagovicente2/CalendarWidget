@@ -121,7 +121,10 @@ class SyncManager @Inject constructor(
         workManager.cancelUniqueWork(SyncWorker.WORK_NAME)
     }
 
-    private fun getIcalUrls(): List<String> {
+    /**
+     * Gets the list of iCal URLs.
+     */
+    fun getIcalUrls(): List<String> {
         return sharedPreferences.getStringSet("ical_urls", emptySet())?.toList() ?: emptyList()
     }
 

@@ -3099,6 +3099,7 @@ drawable ic_call_decline
 drawable ic_call_decline_low
 drawable ic_clear_black_24
 drawable ic_clock_black_24dp
+drawable ic_delete
 drawable ic_keyboard_black_24dp
 drawable ic_m3_chip_check
 drawable ic_m3_chip_checked_circle
@@ -3108,6 +3109,7 @@ drawable ic_mtrl_chip_checked_black
 drawable ic_mtrl_chip_checked_circle
 drawable ic_mtrl_chip_close_circle
 drawable ic_search_black_24
+drawable ic_settings
 drawable indeterminate_static
 drawable m3_avd_hide_password
 drawable m3_avd_show_password
@@ -3251,6 +3253,7 @@ id action_menu_presenter
 id action_mode_bar
 id action_mode_bar_stub
 id action_mode_close_button
+id action_settings
 id action_text
 id actions
 id activity_chooser_view_content
@@ -3284,6 +3287,10 @@ id bounce
 id bounceBoth
 id bounceEnd
 id bounceStart
+id btn_add_ical_url
+id btn_delete
+id btn_google_sign_in
+id btn_google_sign_out
 id btn_sync_now
 id buttonPanel
 id cache_measures
@@ -3373,6 +3380,7 @@ id endToStart
 id enterAlways
 id enterAlwaysCollapsed
 id escape
+id et_ical_url
 id event_color_bar
 id event_date_time
 id event_description
@@ -3566,6 +3574,7 @@ id progress_horizontal
 id radio
 id ratio
 id rectangles
+id recycler_ical_urls
 id report_drawn
 id reverseSawtooth
 id right
@@ -3686,6 +3695,9 @@ id transition_position
 id transition_scene_layoutid_cache
 id transition_transform
 id triangle
+id tv_google_account
+id tv_no_ical_urls
+id tv_url
 id unchecked
 id uniform
 id unlabeled
@@ -3827,6 +3839,7 @@ layout abc_select_dialog_material
 layout abc_tooltip
 layout activity_event_details
 layout activity_main
+layout activity_settings
 layout custom_dialog
 layout design_bottom_navigation_item
 layout design_bottom_sheet_dialog
@@ -3847,6 +3860,7 @@ layout ime_base_split_test_activity
 layout ime_secondary_split_test_activity
 layout item_day_header
 layout item_event
+layout item_ical_url
 layout m3_alert_dialog
 layout m3_alert_dialog_actions
 layout m3_alert_dialog_title
@@ -3908,6 +3922,7 @@ layout select_dialog_item_material
 layout select_dialog_multichoice_material
 layout select_dialog_singlechoice_material
 layout support_simple_spinner_dropdown_item
+menu menu_main
 mipmap ic_launcher
 plurals mtrl_badge_content_description
 string abc_action_bar_home_description

@@ -24,6 +24,8 @@ import com.calendar.widget.sync.SyncManager;
 import com.calendar.widget.ui.detail.EventDetailsActivity;
 import com.calendar.widget.ui.main.MainActivity;
 import com.calendar.widget.ui.main.MainActivity_MembersInjector;
+import com.calendar.widget.ui.settings.SettingsActivity;
+import com.calendar.widget.ui.settings.SettingsActivity_MembersInjector;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -383,6 +385,11 @@ public final class DaggerCalendarWidgetApplication_HiltComponents_SingletonC {
     }
 
     @Override
+    public void injectSettingsActivity(SettingsActivity settingsActivity) {
+      injectSettingsActivity2(settingsActivity);
+    }
+
+    @Override
     public DefaultViewModelFactories.InternalFactoryFactory getHiltInternalFactoryFactory() {
       return DefaultViewModelFactories_InternalFactoryFactory_Factory.newInstance(ImmutableMap.<Class<?>, Boolean>of(), new ViewModelCBuilder(singletonCImpl, activityRetainedCImpl));
     }
@@ -411,6 +418,12 @@ public final class DaggerCalendarWidgetApplication_HiltComponents_SingletonC {
     private MainActivity injectMainActivity2(MainActivity instance) {
       MainActivity_MembersInjector.injectEventRepository(instance, singletonCImpl.eventRepositoryProvider.get());
       MainActivity_MembersInjector.injectSyncManager(instance, singletonCImpl.syncManagerProvider.get());
+      return instance;
+    }
+
+    @CanIgnoreReturnValue
+    private SettingsActivity injectSettingsActivity2(SettingsActivity instance) {
+      SettingsActivity_MembersInjector.injectSyncManager(instance, singletonCImpl.syncManagerProvider.get());
       return instance;
     }
   }

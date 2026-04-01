@@ -10,6 +10,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -45,6 +46,16 @@
             android:name="com.calendar.widget.ui.detail.EventDetailsActivity"
             android:exported="false"
             android:theme="@style/Theme.CalendarWidget" />
+        <activity
+            android:name="com.calendar.widget.ui.settings.SettingsActivity"
+            android:exported="false"
+            android:label="Settings"
+            android:parentActivityName="com.calendar.widget.ui.main.MainActivity"
+            android:theme="@style/Theme.CalendarWidget" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.main.MainActivity" />
+        </activity>
 
         <provider
             android:name="androidx.startup.InitializationProvider"

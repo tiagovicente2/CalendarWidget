@@ -2,17 +2,21 @@ package com.calendar.widget.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.calendar.widget.R
 import com.calendar.widget.data.repository.EventRepository
 import com.calendar.widget.databinding.ActivityMainBinding
 import com.calendar.widget.sync.SyncManager
 import com.calendar.widget.ui.detail.EventDetailsActivity
 import com.calendar.widget.ui.overlay.EventAdapter
+import com.calendar.widget.ui.settings.SettingsActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -44,6 +48,21 @@ class MainActivity : AppCompatActivity() {
         setupFab()
         setupEmptyState()
         observeEvents()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setupRecyclerView() {

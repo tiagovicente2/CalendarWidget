@@ -5,6 +5,7 @@ import com.calendar.widget.di.AppModule;
 import com.calendar.widget.di.NetworkModule;
 import com.calendar.widget.ui.detail.EventDetailsActivity_GeneratedInjector;
 import com.calendar.widget.ui.main.MainActivity_GeneratedInjector;
+import com.calendar.widget.ui.settings.SettingsActivity_GeneratedInjector;
 import dagger.Binds;
 import dagger.Component;
 import dagger.Module;
@@ -185,6 +186,7 @@ public final class CalendarWidgetApplication_HiltComponents {
   @ActivityScoped
   public abstract static class ActivityC implements EventDetailsActivity_GeneratedInjector,
       MainActivity_GeneratedInjector,
+      SettingsActivity_GeneratedInjector,
       ActivityComponent,
       DefaultViewModelFactories.ActivityEntryPoint,
       HiltWrapper_HiltViewModelFactory_ActivityCreatorEntryPoint,
