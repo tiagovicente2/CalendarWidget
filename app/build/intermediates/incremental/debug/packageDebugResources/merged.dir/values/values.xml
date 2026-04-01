@@ -59,19 +59,18 @@
     <style name="TextAppearance.CalendarWidget.BodyMedium" parent="TextAppearance.Material3.BodyMedium"/>
     <style name="TextAppearance.CalendarWidget.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall"/>
     <style name="TextAppearance.CalendarWidget.TitleLarge" parent="TextAppearance.Material3.TitleLarge"/>
-    <style name="Theme.CalendarWidget" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.CalendarWidget" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
+        
         
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryContainer">@color/purple_100</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorOnPrimaryContainer">@color/purple_900</item>
         
-        
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryContainer">@color/teal_100</item>
         <item name="colorOnSecondary">@color/black</item>
         <item name="colorOnSecondaryContainer">@color/teal_900</item>
-        
         
         <item name="colorTertiary">@color/blue_300</item>
         <item name="colorTertiaryContainer">@color/blue_100</item>
@@ -93,9 +92,6 @@
         
         <item name="android:navigationBarColor">?attr/colorSurface</item>
         <item name="android:windowLightNavigationBar">true</item>
-        
-        
-        <item name="android:forceDarkAllowed">true</item>
         
         
         <item name="textAppearanceHeadlineSmall">@style/TextAppearance.CalendarWidget.HeadlineSmall</item>

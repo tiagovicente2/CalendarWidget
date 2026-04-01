@@ -1,18 +1,17 @@
 <resources>
-    <style name="Theme.CalendarWidget" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Primary brand color -->
+    <style name="Theme.CalendarWidget" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
+        <!-- Dynamic colors from Material You will override these -->
+        <!-- Fallback colors in case dynamic colors aren't available -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryContainer">@color/purple_100</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorOnPrimaryContainer">@color/purple_900</item>
         
-        <!-- Secondary brand color -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryContainer">@color/teal_100</item>
         <item name="colorOnSecondary">@color/black</item>
         <item name="colorOnSecondaryContainer">@color/teal_900</item>
         
-        <!-- Tertiary color -->
         <item name="colorTertiary">@color/blue_300</item>
         <item name="colorTertiaryContainer">@color/blue_100</item>
         
@@ -33,9 +32,6 @@
         <!-- Navigation bar -->
         <item name="android:navigationBarColor">?attr/colorSurface</item>
         <item name="android:windowLightNavigationBar">true</item>
-        
-        <!-- Enable dynamic colors (Material You) -->
-        <item name="android:forceDarkAllowed">true</item>
         
         <!-- Typography -->
         <item name="textAppearanceHeadlineSmall">@style/TextAppearance.CalendarWidget.HeadlineSmall</item>

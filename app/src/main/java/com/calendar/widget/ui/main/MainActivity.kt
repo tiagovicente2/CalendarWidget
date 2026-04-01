@@ -2,6 +2,7 @@ package com.calendar.widget.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -126,9 +127,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openGoogleCalendar() {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            data = android.net.Uri.parse("https://calendar.google.com")
+        try {
+            // Try to open Google Calendar app first
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = android.net.Uri.parse("https://calendar.google.com")
+            }
+            
+            // Check if there's an app that can handle this intent
+            if (intent.resolveActivity(packageManager) != null) {
+                startActivity(intent)
+            } else {
+                // No app available, try browser
+                val browserIntent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://calendar.google.com"))
+                if (browserIntent.resolveActivity(packageManager) != null) {
+                    startActivity(browserIntent)
+                } else {
+                    Toast.makeText(this, "No browser or calendar app available", Toast.LENGTH_LONG).show()
+                }
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Cannot open Google Calendar: ${e.message}", Toast.LENGTH_LONG).show()
         }
-        startActivity(intent)
     }
 }
