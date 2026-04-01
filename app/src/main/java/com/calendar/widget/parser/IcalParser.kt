@@ -4,6 +4,8 @@ import com.calendar.widget.data.remote.dto.IcalEventDto
 import net.fortuna.ical4j.data.CalendarBuilder
 import net.fortuna.ical4j.model.Property
 import net.fortuna.ical4j.model.component.VEvent
+import net.fortuna.ical4j.model.property.DtStart
+import net.fortuna.ical4j.model.property.DtEnd
 import java.io.StringReader
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,21 +38,17 @@ class IcalParser @Inject constructor() {
         val location = vevent.getProperty<Property>(Property.LOCATION)?.value
         val description = vevent.getProperty<Property>(Property.DESCRIPTION)?.value
 
-        val startDate = vevent.getProperty<net.fortuna.ical4j.model.property.DtStart>(Property.DT_START)
-        val endDate = vevent.getProperty<net.fortuna.ical4j.model.property.DtEnd>(Property.DT_END)
+        val startDate = vevent.getProperty<DtStart>(Property.DTSTART)
+        val endDate = vevent.getProperty<DtEnd>(Property.DTEND)
 
         val isAllDay = startDate?.isUtc == false && startDate.date is net.fortuna.ical4j.model.Date
 
-        val startTime = if (isAllDay) {
-            startDate?.date?.time ?: return null
-        } else {
-            startDate?.date?.time ?: return null
-        }
+        val startTime = startDate?.date?.time ?: return null
 
         val endTime = if (isAllDay) {
-            endDate?.date?.time ?: startTime
+            endDate?.date?.time ?: (startTime + 86400000) // Next day
         } else {
-            endDate?.date?.time ?: (startTime + 3600000) // Default 1 hour duration
+            endDate?.date?.time ?: (startTime + 3600000) // Default 1 hour
         }
 
         return IcalEventDto(

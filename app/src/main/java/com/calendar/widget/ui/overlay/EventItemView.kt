@@ -3,9 +3,9 @@ package com.calendar.widget.ui.overlay
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import com.calendar.widget.R
 import com.calendar.widget.data.model.Event
 import java.text.SimpleDateFormat
@@ -29,7 +29,7 @@ class EventItemView @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context).inflate(R.layout.item_event, this, true)
-        orientation = HORIZONTAL
+        orientation = LinearLayout.HORIZONTAL
         
         titleText = findViewById(R.id.event_title)
         detailsText = findViewById(R.id.event_details)

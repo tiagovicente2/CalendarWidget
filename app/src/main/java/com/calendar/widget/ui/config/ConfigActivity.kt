@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.calendar.widget.R
 import com.calendar.widget.databinding.ActivityConfigBinding
 import com.calendar.widget.service.FloatingCalendarService
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +27,13 @@ class ConfigActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
+
+        // Show WelcomeFragment
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.container, WelcomeFragment())
+                .commitNow()
+        }
 
         // If this is first launch, start service
         if (!FloatingCalendarService.isRunning) {

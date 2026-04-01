@@ -38,6 +38,21 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    packagingOptions {
+        resources {
+            excludes += listOf(
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/groovy/**",
+                "META-INF/groovy-release-info.properties",
+                "META-INF/INDEX.LIST"
+            )
+            pickFirsts += listOf("META-INF/**")
+        }
+    }
     // Disable deprecated features
     lint {
         disable += "OldTargetApi"
