@@ -1,0 +1,50 @@
+# Gradle files
+.gradle/
+build/
+app/build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log/OS Files
+*.log
+
+# Android Studio generated files and folders
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+output-metadata.json
+
+# IntelliJ
+*.iml
+.idea/
+
+# Keystore files
+*.jks
+*.keystore
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+
+# Android Profiling
+*.hprof
+
+# Kotlin
+.kotlin/
+
+# Exclude AI/documentation directories
+.opencode/
+docs/superpowers/
+
+# Exclude test/temp files
+test_account_picker.kt
+sha256.txt
+PLAN.md
+
+# Exclude screenshots (optional - comment out if you want them)
+*.png
+*.jpeg
+*.jpg
+!app/src/main/res/**/*.png
+!app/src/main/res/**/*.jpg
