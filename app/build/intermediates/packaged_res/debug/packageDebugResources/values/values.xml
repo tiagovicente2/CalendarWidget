@@ -1,11 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <color name="blue_100">#BBDEFB</color>
+    <color name="blue_200">#90CAF9</color>
+    <color name="blue_300">#64B5F6</color>
+    <color name="blue_400">#42A5F5</color>
+    <color name="blue_50">#E3F2FD</color>
+    <color name="blue_500">#2196F3</color>
+    <color name="blue_600">#1E88E5</color>
+    <color name="blue_700">#1976D2</color>
+    <color name="blue_800">#1565C0</color>
+    <color name="blue_900">#0D47A1</color>
+    <color name="error_dark">#F2B8B5</color>
+    <color name="error_light">#B3261E</color>
+    <color name="event_blue">#4285F4</color>
+    <color name="event_cyan">#00BCD4</color>
+    <color name="event_green">#34A853</color>
+    <color name="event_orange">#FF9800</color>
+    <color name="event_pink">#E91E63</color>
+    <color name="event_purple">#9C27B0</color>
+    <color name="event_red">#EA4335</color>
+    <color name="event_yellow">#FBBC05</color>
+    <color name="gray_400">#BDBDBD</color>
+    <color name="gray_600">#757575</color>
+    <color name="purple_100">#E1BEE7</color>
+    <color name="purple_200">#CE93D8</color>
+    <color name="purple_300">#BA68C8</color>
+    <color name="purple_400">#AB47BC</color>
+    <color name="purple_50">#F3E5F5</color>
+    <color name="purple_500">#9C27B0</color>
+    <color name="purple_600">#8E24AA</color>
+    <color name="purple_700">#7B1FA2</color>
+    <color name="purple_800">#6A1B9A</color>
+    <color name="purple_900">#4A148C</color>
+    <color name="surface_variant_dark">#49454F</color>
+    <color name="surface_variant_light">#E7E0EC</color>
+    <color name="teal_100">#B2DFDB</color>
+    <color name="teal_200">#80CBC4</color>
+    <color name="teal_300">#4DB6AC</color>
+    <color name="teal_400">#26A69A</color>
+    <color name="teal_50">#E0F2F1</color>
+    <color name="teal_500">#009688</color>
+    <color name="teal_600">#00897B</color>
+    <color name="teal_700">#00796B</color>
+    <color name="teal_800">#00695C</color>
+    <color name="teal_900">#004D40</color>
     <color name="white">#FFFFFFFF</color>
     <string name="add_event">Add event</string>
     <string name="app_name">Calendar Widget</string>
@@ -16,16 +55,52 @@
     <string name="permission_required">Permission Required</string>
     <string name="service_notification_text">Tap to open calendar widget</string>
     <string name="service_notification_title">Calendar Widget</string>
+    <style name="TextAppearance.CalendarWidget.BodyLarge" parent="TextAppearance.Material3.BodyLarge"/>
+    <style name="TextAppearance.CalendarWidget.BodyMedium" parent="TextAppearance.Material3.BodyMedium"/>
+    <style name="TextAppearance.CalendarWidget.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall"/>
+    <style name="TextAppearance.CalendarWidget.TitleLarge" parent="TextAppearance.Material3.TitleLarge"/>
     <style name="Theme.CalendarWidget" parent="Theme.Material3.DayNight.NoActionBar">
         
         <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimaryContainer">@color/purple_100</item>
         <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnPrimaryContainer">@color/purple_900</item>
+        
         
         <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorSecondaryContainer">@color/teal_100</item>
         <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondaryContainer">@color/teal_900</item>
         
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        
+        <item name="colorTertiary">@color/blue_300</item>
+        <item name="colorTertiaryContainer">@color/blue_100</item>
+        
+        
+        <item name="colorSurface">@android:color/system_surface_light</item>
+        <item name="colorSurfaceVariant">@color/surface_variant_light</item>
+        <item name="colorOnSurface">@color/black</item>
+        <item name="colorOnSurfaceVariant">@color/gray_600</item>
+        
+        
+        <item name="colorError">@color/error_light</item>
+        <item name="colorOnError">@color/white</item>
+        
+        
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar">true</item>
+        
+        
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        
+        
+        <item name="android:forceDarkAllowed">true</item>
+        
+        
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.CalendarWidget.HeadlineSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.CalendarWidget.TitleLarge</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.CalendarWidget.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.CalendarWidget.BodyMedium</item>
     </style>
 </resources>

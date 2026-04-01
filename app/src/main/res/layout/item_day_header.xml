@@ -1,26 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingVertical="16dp"
+    android:paddingVertical="20dp"
+    android:paddingHorizontal="4dp"
     android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/day_number"
-        android:layout_width="wrap_content"
+    <!-- Day number container -->
+    <LinearLayout
+        android:layout_width="48dp"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="?attr/colorPrimary"
-        android:minWidth="48dp" />
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/day_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textAllCaps="true" />
+
+        <TextView
+            android:id="@+id/day_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorPrimary" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/day_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:textSize="14sp"
         android:textColor="?attr/colorOnSurfaceVariant"
         android:text="@string/no_events" />

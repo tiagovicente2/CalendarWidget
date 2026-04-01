@@ -4,7 +4,7 @@ package com.calendar.widget.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -14,6 +14,7 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.calendar.widget.R;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -24,7 +25,10 @@ public final class ActivityMainBinding implements ViewBinding {
   private final CoordinatorLayout rootView;
 
   @NonNull
-  public final TextView emptyStateText;
+  public final MaterialButton btnSyncNow;
+
+  @NonNull
+  public final LinearLayout emptyStateContainer;
 
   @NonNull
   public final RecyclerView eventsRecyclerView;
@@ -38,11 +42,13 @@ public final class ActivityMainBinding implements ViewBinding {
   @NonNull
   public final MaterialToolbar toolbar;
 
-  private ActivityMainBinding(@NonNull CoordinatorLayout rootView, @NonNull TextView emptyStateText,
+  private ActivityMainBinding(@NonNull CoordinatorLayout rootView,
+      @NonNull MaterialButton btnSyncNow, @NonNull LinearLayout emptyStateContainer,
       @NonNull RecyclerView eventsRecyclerView, @NonNull FloatingActionButton fabAdd,
       @NonNull SwipeRefreshLayout swipeRefresh, @NonNull MaterialToolbar toolbar) {
     this.rootView = rootView;
-    this.emptyStateText = emptyStateText;
+    this.btnSyncNow = btnSyncNow;
+    this.emptyStateContainer = emptyStateContainer;
     this.eventsRecyclerView = eventsRecyclerView;
     this.fabAdd = fabAdd;
     this.swipeRefresh = swipeRefresh;
@@ -76,9 +82,15 @@ public final class ActivityMainBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.empty_state_text;
-      TextView emptyStateText = ViewBindings.findChildViewById(rootView, id);
-      if (emptyStateText == null) {
+      id = R.id.btn_sync_now;
+      MaterialButton btnSyncNow = ViewBindings.findChildViewById(rootView, id);
+      if (btnSyncNow == null) {
+        break missingId;
+      }
+
+      id = R.id.empty_state_container;
+      LinearLayout emptyStateContainer = ViewBindings.findChildViewById(rootView, id);
+      if (emptyStateContainer == null) {
         break missingId;
       }
 
@@ -106,7 +118,7 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityMainBinding((CoordinatorLayout) rootView, emptyStateText,
+      return new ActivityMainBinding((CoordinatorLayout) rootView, btnSyncNow, emptyStateContainer,
           eventsRecyclerView, fabAdd, swipeRefresh, toolbar);
     }
     String missingId = rootView.getResources().getResourceName(id);

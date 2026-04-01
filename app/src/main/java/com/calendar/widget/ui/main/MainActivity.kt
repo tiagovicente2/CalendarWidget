@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         setupRecyclerView()
         setupPullToRefresh()
         setupFab()
+        setupEmptyState()
         observeEvents()
     }
 
@@ -84,6 +85,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupEmptyState() {
+        binding.btnSyncNow.setOnClickListener {
+            lifecycleScope.launch {
+                binding.swipeRefresh.isRefreshing = true
+                syncManager.performFullSync()
+                binding.swipeRefresh.isRefreshing = false
+            }
+        }
+    }
+
     private fun observeEvents() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -94,10 +105,10 @@ class MainActivity : AppCompatActivity() {
                         
                         // Show/hide empty state
                         if (events.isEmpty()) {
-                            binding.emptyStateText.visibility = android.view.View.VISIBLE
+                            binding.emptyStateContainer.visibility = android.view.View.VISIBLE
                             binding.eventsRecyclerView.visibility = android.view.View.GONE
                         } else {
-                            binding.emptyStateText.visibility = android.view.View.GONE
+                            binding.emptyStateContainer.visibility = android.view.View.GONE
                             binding.eventsRecyclerView.visibility = android.view.View.VISIBLE
                         }
                     }

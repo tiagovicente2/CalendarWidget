@@ -20,14 +20,18 @@ public final class ItemDayHeaderBinding implements ViewBinding {
   private final LinearLayout rootView;
 
   @NonNull
+  public final TextView dayName;
+
+  @NonNull
   public final TextView dayNumber;
 
   @NonNull
   public final TextView dayStatus;
 
-  private ItemDayHeaderBinding(@NonNull LinearLayout rootView, @NonNull TextView dayNumber,
-      @NonNull TextView dayStatus) {
+  private ItemDayHeaderBinding(@NonNull LinearLayout rootView, @NonNull TextView dayName,
+      @NonNull TextView dayNumber, @NonNull TextView dayStatus) {
     this.rootView = rootView;
+    this.dayName = dayName;
     this.dayNumber = dayNumber;
     this.dayStatus = dayStatus;
   }
@@ -59,6 +63,12 @@ public final class ItemDayHeaderBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.day_name;
+      TextView dayName = ViewBindings.findChildViewById(rootView, id);
+      if (dayName == null) {
+        break missingId;
+      }
+
       id = R.id.day_number;
       TextView dayNumber = ViewBindings.findChildViewById(rootView, id);
       if (dayNumber == null) {
@@ -71,7 +81,7 @@ public final class ItemDayHeaderBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ItemDayHeaderBinding((LinearLayout) rootView, dayNumber, dayStatus);
+      return new ItemDayHeaderBinding((LinearLayout) rootView, dayName, dayNumber, dayStatus);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

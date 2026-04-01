@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingVertical="8dp"
-    android:gravity="top">
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="4dp"
+    android:gravity="top"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <!-- Event color bar -->
     <View
         android:id="@+id/event_color_bar"
         android:layout_width="4dp"
         android:layout_height="match_parent"
-        android:layout_marginEnd="12dp"
+        android:layout_marginEnd="16dp"
         android:background="?attr/colorPrimary" />
 
     <LinearLayout
@@ -25,18 +30,19 @@
             android:id="@+id/event_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="?attr/colorOnSurface"
             android:maxLines="2"
-            android:ellipsize="end" />
+            android:ellipsize="end"
+            android:lineSpacingMultiplier="1.1" />
 
         <TextView
             android:id="@+id/event_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textSize="12sp"
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
             android:textColor="?attr/colorOnSurfaceVariant"
             android:maxLines="1"
             android:ellipsize="end" />
