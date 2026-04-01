@@ -61,7 +61,8 @@ import retrofit2.Retrofit;
     "unchecked",
     "rawtypes",
     "KotlinInternal",
-    "KotlinInternalInJava"
+    "KotlinInternalInJava",
+    "cast"
 })
 public final class DaggerCalendarWidgetApplication_HiltComponents_SingletonC {
   private DaggerCalendarWidgetApplication_HiltComponents_SingletonC() {
@@ -383,12 +384,12 @@ public final class DaggerCalendarWidgetApplication_HiltComponents_SingletonC {
 
     @Override
     public DefaultViewModelFactories.InternalFactoryFactory getHiltInternalFactoryFactory() {
-      return DefaultViewModelFactories_InternalFactoryFactory_Factory.newInstance(ImmutableSet.<String>of(), new ViewModelCBuilder(singletonCImpl, activityRetainedCImpl));
+      return DefaultViewModelFactories_InternalFactoryFactory_Factory.newInstance(ImmutableMap.<Class<?>, Boolean>of(), new ViewModelCBuilder(singletonCImpl, activityRetainedCImpl));
     }
 
     @Override
-    public Set<String> getViewModelKeys() {
-      return ImmutableSet.<String>of();
+    public Map<Class<?>, Boolean> getViewModelKeys() {
+      return ImmutableMap.<Class<?>, Boolean>of();
     }
 
     @Override
@@ -431,13 +432,13 @@ public final class DaggerCalendarWidgetApplication_HiltComponents_SingletonC {
     }
 
     @Override
-    public Map<String, Provider<ViewModel>> getHiltViewModelMap() {
-      return ImmutableMap.<String, Provider<ViewModel>>of();
+    public Map<Class<?>, Provider<ViewModel>> getHiltViewModelMap() {
+      return ImmutableMap.<Class<?>, Provider<ViewModel>>of();
     }
 
     @Override
-    public Map<String, Object> getHiltViewModelAssistedMap() {
-      return ImmutableMap.<String, Object>of();
+    public Map<Class<?>, Object> getHiltViewModelAssistedMap() {
+      return ImmutableMap.<Class<?>, Object>of();
     }
   }
 
