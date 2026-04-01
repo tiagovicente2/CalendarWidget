@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Calendar Widget</string>
+    <string name="no_events">No upcoming events</string>
+    <string name="last_updated">Last updated: %1$s</string>
+    <string name="permission_required">Permission Required</string>
+    <string name="overlay_permission_explanation">This app needs permission to draw over other apps to display the floating calendar widget.</string>
+    <string name="open_settings">Open Settings</string>
+    <string name="service_notification_title">Calendar Widget</string>
+    <string name="service_notification_text">Tap to open calendar widget</string>
+    <string name="add_event">Add event</string>
+</resources>
