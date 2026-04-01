@@ -91,15 +91,4 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
-        android:contentDescription="@string/add_event"
-        app:srcCompat="@drawable/ic_add"
-        app:fabSize="normal"
-        app:elevation="6dp" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -9,4 +9,5 @@
     <string name="service_notification_title">Calendar Widget</string>
     <string name="service_notification_text">Tap to open calendar widget</string>
     <string name="add_event">Add event</string>
+    <string name="default_web_client_id">615874776526-a3haktcvr206halut95gva66681uobb5.apps.googleusercontent.com</string>
 </resources>

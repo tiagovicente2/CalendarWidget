@@ -1,6 +1,7 @@
 package com.calendar.widget.ui.settings
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -8,23 +9,19 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.calendar.widget.R
+import com.calendar.widget.data.local.prefs.PreferenceKeys
 import com.calendar.widget.databinding.ActivitySettingsBinding
 import com.calendar.widget.sync.SyncManager
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.Scope
-import com.google.api.services.calendar.CalendarScopes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * Settings activity for managing calendar sources.
- * Includes Google Sign-In and iCal URL management.
- */
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
 
@@ -32,14 +29,15 @@ class SettingsActivity : AppCompatActivity() {
     lateinit var syncManager: SyncManager
 
     private lateinit var binding: ActivitySettingsBinding
-    private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var icalUrlAdapter: IcalUrlAdapter
+    private lateinit var googleCalendarAdapter: GoogleCalendarAdapter
 
-    private val signInLauncher = registerForActivityResult(
+    private val authLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            handleSignInResult(result.data)
+            triggerSync()
+            fetchGoogleCalendars()
         }
     }
 
@@ -50,9 +48,62 @@ class SettingsActivity : AppCompatActivity() {
 
         setupToolbar()
         setupGoogleSignIn()
+        setupGoogleCalendarList()
         setupIcalUrlList()
         setupAddIcalUrl()
         refreshUi()
+        fetchGoogleCalendars()
+    }
+
+    private fun setupGoogleCalendarList() {
+        googleCalendarAdapter = GoogleCalendarAdapter { calendarId, isSelected ->
+            val currentSelected = syncManager.getSelectedGoogleCalendars().toMutableSet()
+            if (isSelected) {
+                currentSelected.add(calendarId)
+            } else {
+                currentSelected.remove(calendarId)
+            }
+            syncManager.setSelectedGoogleCalendars(currentSelected.toList())
+            triggerSync()
+        }
+        
+        binding.recyclerGoogleCalendars.layoutManager = LinearLayoutManager(this)
+        binding.recyclerGoogleCalendars.adapter = googleCalendarAdapter
+    }
+
+    private fun fetchGoogleCalendars() {
+        if (getSavedGoogleAccount() != null) {
+            lifecycleScope.launch {
+                try {
+                    val calendars = syncManager.getGoogleCalendarList()
+                    if (calendars.isNotEmpty()) {
+                        googleCalendarAdapter.submitList(calendars)
+                        googleCalendarAdapter.setSelectedIds(syncManager.getSelectedGoogleCalendars())
+                        binding.tvGoogleCalendarsTitle.visibility = android.view.View.VISIBLE
+                        binding.recyclerGoogleCalendars.visibility = android.view.View.VISIBLE
+                    }
+                } catch (e: com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException) {
+                    // Handled in triggerSync or manual click
+                } catch (e: Exception) {
+                    android.util.Log.e("SettingsActivity", "Error fetching calendars", e)
+                }
+            }
+        } else {
+            binding.tvGoogleCalendarsTitle.visibility = android.view.View.GONE
+            binding.recyclerGoogleCalendars.visibility = android.view.View.GONE
+        }
+    }
+
+    private fun triggerSync() {
+        lifecycleScope.launch {
+            try {
+                syncManager.performFullSync()
+            } catch (e: com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException) {
+                authLauncher.launch(e.intent)
+            } catch (e: Exception) {
+                Toast.makeText(this@SettingsActivity, "Sync failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setupToolbar() {
@@ -62,55 +113,89 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupGoogleSignIn() {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .requestScopes(Scope(CalendarScopes.CALENDAR_READONLY))
-            .build()
-
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-
-        // Check if already signed in
-        val account = GoogleSignIn.getLastSignedInAccount(this)
-        updateGoogleSignInUi(account)
+        val currentAccount = getSavedGoogleAccount()
+        updateGoogleSignInUi(currentAccount)
 
         binding.btnGoogleSignIn.setOnClickListener {
-            val signInIntent = googleSignInClient.signInIntent
-            signInLauncher.launch(signInIntent)
+            launchGoogleSignIn()
         }
 
         binding.btnGoogleSignOut.setOnClickListener {
-            googleSignInClient.signOut().addOnCompleteListener {
-                updateGoogleSignInUi(null)
-                Toast.makeText(this, "Signed out", Toast.LENGTH_SHORT).show()
-            }
+            saveGoogleAccount(null)
+            updateGoogleSignInUi(null)
+            Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun handleSignInResult(data: Intent?) {
-        try {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            val account = task.getResult(ApiException::class.java)
-            updateGoogleSignInUi(account)
+    private fun launchGoogleSignIn() {
+        lifecycleScope.launch {
+            val credentialManager = CredentialManager.create(this@SettingsActivity)
+            val webClientId = getString(R.string.default_web_client_id)
             
-            // Trigger sync with new account
-            lifecycleScope.launch {
-                syncManager.performFullSync()
-                Toast.makeText(this@SettingsActivity, "Signed in as ${account?.email}", Toast.LENGTH_SHORT).show()
+            val googleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(webClientId)
+                .setAutoSelectEnabled(false)
+                .setNonce(java.util.UUID.randomUUID().toString())
+                .build()
+
+            val request = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
+
+            try {
+                val result = credentialManager.getCredential(
+                    request = request,
+                    context = this@SettingsActivity
+                )
+                
+                val credential = result.credential
+                if (credential is androidx.credentials.CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                    val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                    val email = googleIdTokenCredential.id
+                    saveGoogleAccount(email)
+                    updateGoogleSignInUi(email)
+                    
+                    // Trigger sync with new account
+                    triggerSync()
+                    Toast.makeText(this@SettingsActivity, "Connected to $email", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: GetCredentialException) {
+                android.util.Log.e("SettingsActivity", "GetCredentialException: ${e.type} - ${e.errorMessage}", e)
+                Toast.makeText(this@SettingsActivity, "Sign in failed: ${e.type}", Toast.LENGTH_LONG).show()
+            } catch (e: Exception) {
+                android.util.Log.e("SettingsActivity", "Exception", e)
+                Toast.makeText(this@SettingsActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-        } catch (e: ApiException) {
-            Toast.makeText(this, "Sign in failed: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun updateGoogleSignInUi(account: GoogleSignInAccount?) {
-        if (account != null) {
-            binding.tvGoogleAccount.text = "Connected: ${account.email}"
+    private fun saveGoogleAccount(accountName: String?) {
+        val prefs = getSharedPreferences(PreferenceKeys.PREFS_NAME, Context.MODE_PRIVATE)
+        if (accountName != null) {
+            prefs.edit().putString(PreferenceKeys.GOOGLE_ACCOUNT, accountName).apply()
+        } else {
+            prefs.edit().remove(PreferenceKeys.GOOGLE_ACCOUNT).apply()
+        }
+    }
+
+    private fun getSavedGoogleAccount(): String? {
+        val prefs = getSharedPreferences(PreferenceKeys.PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(PreferenceKeys.GOOGLE_ACCOUNT, null)
+    }
+
+    private fun updateGoogleSignInUi(accountName: String?) {
+        if (accountName != null) {
+            binding.tvGoogleAccount.text = "Connected: $accountName"
             binding.btnGoogleSignIn.visibility = android.view.View.GONE
             binding.btnGoogleSignOut.visibility = android.view.View.VISIBLE
+            fetchGoogleCalendars()
         } else {
             binding.tvGoogleAccount.text = "Not connected"
             binding.btnGoogleSignIn.visibility = android.view.View.VISIBLE
             binding.btnGoogleSignOut.visibility = android.view.View.GONE
+            binding.tvGoogleCalendarsTitle.visibility = android.view.View.GONE
+            binding.recyclerGoogleCalendars.visibility = android.view.View.GONE
         }
     }
 
@@ -140,10 +225,8 @@ class SettingsActivity : AppCompatActivity() {
         refreshUi()
         
         // Trigger sync
-        lifecycleScope.launch {
-            syncManager.performFullSync()
-            Toast.makeText(this@SettingsActivity, "Added calendar", Toast.LENGTH_SHORT).show()
-        }
+        triggerSync()
+        Toast.makeText(this@SettingsActivity, "Added calendar", Toast.LENGTH_SHORT).show()
     }
 
     private fun removeIcalUrl(url: String) {

@@ -1,6 +1,7 @@
 package com.calendar.widget.sync
 
 import android.content.Context
+import com.calendar.widget.util.Logger
 import com.calendar.widget.data.model.Event
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.http.javanet.NetHttpTransport
@@ -25,12 +26,26 @@ class GoogleCalendarSync @Inject constructor(
      * Must be called before syncCalendar() after user signs in.
      * 
      * @param accountName The Google account email address
+     * @return true if account was found and credential set, false otherwise
      */
-    fun setCredential(accountName: String) {
+    fun setCredential(accountName: String): Boolean {
+        val accountManager = android.accounts.AccountManager.get(context)
+        val allAccounts = accountManager.accounts
+        Logger.d("GoogleCalendarSync", "All visible accounts: ${allAccounts.joinToString { "${it.name} (${it.type})" }}")
+        
+        val account = allAccounts.find { it.name == accountName && it.type == "com.google" }
+        
+        if (account == null) {
+            Logger.e("GoogleCalendarSync", "Account $accountName not found in device AccountManager. " +
+                "User needs to add this account to the device first.")
+            calendarService = null
+            return false
+        }
+
         val credential = GoogleAccountCredential.usingOAuth2(
             context,
             listOf(CalendarScopes.CALENDAR_READONLY)
-        ).setSelectedAccountName(accountName)
+        ).setSelectedAccount(account)
 
         calendarService = Calendar.Builder(
             NetHttpTransport(),
@@ -39,33 +54,69 @@ class GoogleCalendarSync @Inject constructor(
         )
             .setApplicationName("Calendar Widget")
             .build()
+            
+        return true
     }
 
     /**
-     * Syncs events from the primary Google Calendar.
-     * 
-     * @return List of events, or empty list if not authenticated or on error
+     * Gets the list of calendars available to the user.
      */
-    suspend fun syncCalendar(): List<Event> {
-        val service = calendarService ?: return emptyList()
-        
-        return try {
-            val now = com.google.api.client.util.DateTime(System.currentTimeMillis())
-            val events = service.events().list("primary")
-                .setTimeMin(now)
-                .setOrderBy("startTime")
-                .setSingleEvents(true)
-                .execute()
-
-            events.items?.mapNotNull { googleEvent ->
-                mapGoogleEventToDomain(googleEvent)
-            } ?: emptyList()
+    suspend fun getCalendarList(): List<com.google.api.services.calendar.model.CalendarListEntry> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        val service = calendarService ?: return@withContext emptyList()
+        try {
+            val calendarList = service.calendarList().list().execute()
+            calendarList.items ?: emptyList()
+        } catch (e: com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException) {
+            throw e
         } catch (e: Exception) {
+            Logger.e("GoogleCalendarSync", "Error fetching calendar list", e)
             emptyList()
         }
     }
 
-    private fun mapGoogleEventToDomain(googleEvent: com.google.api.services.calendar.model.Event): Event? {
+    /**
+     * Syncs events from a specific Google Calendar.
+     * 
+     * @param calendarId The ID of the calendar to sync (defaults to "primary")
+     * @param calendarColor The background color of the calendar to use as fallback
+     * @return List of events, or empty list if not authenticated or on error
+     */
+    suspend fun syncCalendar(calendarId: String = "primary", calendarColor: Int? = null): List<Event> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        Logger.d("GoogleCalendarSync", "syncCalendar ($calendarId) running on thread: ${Thread.currentThread().name}")
+        val service = calendarService ?: run {
+            Logger.e("GoogleCalendarSync", "Calendar service is null")
+            return@withContext emptyList<Event>()
+        }
+        
+        try {
+            val calendar = java.util.Calendar.getInstance()
+            calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
+            calendar.set(java.util.Calendar.MINUTE, 0)
+            calendar.set(java.util.Calendar.SECOND, 0)
+            calendar.set(java.util.Calendar.MILLISECOND, 0)
+            
+            val startOfToday = com.google.api.client.util.DateTime(calendar.timeInMillis)
+            Logger.d("GoogleCalendarSync", "Fetching events from $calendarId since $startOfToday")
+            val events = service.events().list(calendarId)
+                .setTimeMin(startOfToday)
+                .setOrderBy("startTime")
+                .setSingleEvents(true)
+                .execute()
+
+            Logger.d("GoogleCalendarSync", "Fetched ${events.items?.size ?: 0} events from $calendarId")
+            events.items?.mapNotNull { googleEvent ->
+                mapGoogleEventToDomain(googleEvent, calendarColor)
+            } ?: emptyList()
+        } catch (e: com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException) {
+            Logger.e("GoogleCalendarSync", "UserRecoverableAuthIOException: needs user intervention", e)
+            throw e
+        } catch (e: Exception) {
+            Logger.e("GoogleCalendarSync", "Error syncing Google Calendar $calendarId", e)
+            emptyList()
+        }
+    }
+
+    private fun mapGoogleEventToDomain(googleEvent: com.google.api.services.calendar.model.Event, fallbackColor: Int?): Event? {
         val id = googleEvent.id ?: return null
         val title = googleEvent.summary ?: "Untitled"
         
@@ -85,7 +136,11 @@ class GoogleCalendarSync @Inject constructor(
             end.dateTime?.value ?: (startTime + 3600000)
         }
 
-        val color = mapGoogleColor(googleEvent.colorId)
+        val color = if (googleEvent.colorId != null) {
+            mapGoogleColor(googleEvent.colorId)
+        } else {
+            fallbackColor ?: -769226 // Default blue
+        }
 
         return Event(
             id = "google_$id",

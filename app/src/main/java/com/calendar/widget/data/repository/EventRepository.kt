@@ -45,6 +45,11 @@ class EventRepository @Inject constructor(
         eventDao.deleteEventsBySource(Event.SOURCE_GOOGLE)
     }
 
+    suspend fun replaceEventsForSource(source: String, newEvents: List<Event>) {
+        val entities = newEvents.map { it.toEntity() }
+        eventDao.replaceEventsForSource(source, entities)
+    }
+
     suspend fun clearIcalEvents(url: String) {
         eventDao.deleteEventsBySource(Event.createIcalSource(url))
     }

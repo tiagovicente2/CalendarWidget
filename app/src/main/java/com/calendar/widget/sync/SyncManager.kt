@@ -7,6 +7,8 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.calendar.widget.util.Logger
+import com.calendar.widget.data.local.prefs.PreferenceKeys
 import com.calendar.widget.data.model.Event
 import com.calendar.widget.data.repository.EventRepository
 import com.calendar.widget.service.SyncWorker
@@ -28,8 +30,6 @@ class SyncManager @Inject constructor(
     private val sharedPreferences: SharedPreferences
 ) {
     companion object {
-        private const val PREF_LAST_SYNC = "last_sync_timestamp"
-        private const val PREF_SYNC_INTERVAL = "sync_interval_hours"
         private const val DEFAULT_SYNC_INTERVAL = 6
         private const val SMART_SYNC_THRESHOLD_MS = 3600000L // 1 hour
     }
@@ -40,15 +40,55 @@ class SyncManager @Inject constructor(
      * Performs a full sync of all calendar sources.
      * Clears old data, fetches fresh data, and stores in local database.
      */
-    suspend fun performFullSync() {
+    suspend fun performFullSync() = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         val allEvents = mutableListOf<Event>()
 
         // Sync Google Calendar
-        val googleEvents = googleCalendarSync.syncCalendar()
-        if (googleEvents.isNotEmpty()) {
-            eventRepository.clearGoogleCalendarEvents()
-            eventRepository.saveEvents(googleEvents)
-            allEvents.addAll(googleEvents)
+        val accountEmail = sharedPreferences.getString(PreferenceKeys.GOOGLE_ACCOUNT, null)
+        Logger.d("SyncManager", "Performing full sync. Account: $accountEmail")
+        if (accountEmail != null) {
+            val credentialSet = googleCalendarSync.setCredential(accountEmail)
+            if (!credentialSet) {
+                Logger.w("SyncManager", "Failed to set credentials for $accountEmail")
+                // Clear saved account since it's no longer valid on this device
+                sharedPreferences.edit().remove(PreferenceKeys.GOOGLE_ACCOUNT).apply()
+                return@withContext
+            }
+            
+            val selectedCalendars = getSelectedGoogleCalendars()
+            val calendarsToSyncIds = if (selectedCalendars.isEmpty()) listOf("primary") else selectedCalendars
+            
+            // Fetch calendar list to get colors
+            val availableCalendars = try {
+                googleCalendarSync.getCalendarList()
+            } catch (e: Exception) {
+                emptyList()
+            }
+            
+            // Fetch all events first
+            val allNewGoogleEvents = mutableListOf<Event>()
+            calendarsToSyncIds.forEach { calendarId ->
+                Logger.d("SyncManager", "Syncing Google Calendar: $calendarId")
+                
+                val calendarEntry = availableCalendars.find { it.id == calendarId }
+                val calendarColor = calendarEntry?.let { entry ->
+                    try {
+                        android.graphics.Color.parseColor(entry.backgroundColor)
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+                
+                val googleEvents = googleCalendarSync.syncCalendar(calendarId, calendarColor)
+                Logger.d("SyncManager", "Fetched ${googleEvents.size} events from $calendarId")
+                allNewGoogleEvents.addAll(googleEvents)
+            }
+            
+            // Replace in DB once
+            eventRepository.replaceEventsForSource(Event.SOURCE_GOOGLE, allNewGoogleEvents)
+            allEvents.addAll(allNewGoogleEvents)
+        } else {
+            Logger.w("SyncManager", "No Google account connected, skipping Google sync")
         }
 
         // Sync iCal calendars
@@ -56,8 +96,7 @@ class SyncManager @Inject constructor(
         icalUrls.forEach { url ->
             val icalEvents = icalSync.syncCalendar(url)
             if (icalEvents.isNotEmpty()) {
-                eventRepository.clearIcalEvents(url)
-                eventRepository.saveEvents(icalEvents)
+                eventRepository.replaceEventsForSource(Event.createIcalSource(url), icalEvents)
                 allEvents.addAll(icalEvents)
             }
         }
@@ -68,8 +107,11 @@ class SyncManager @Inject constructor(
 
         // Update last sync timestamp
         sharedPreferences.edit()
-            .putLong(PREF_LAST_SYNC, System.currentTimeMillis())
+            .putLong(PreferenceKeys.LAST_SYNC_TIMESTAMP, System.currentTimeMillis())
             .apply()
+
+        // Notify widget to update
+        com.calendar.widget.widget.CalendarAppWidgetProvider.sendRefreshBroadcast(context)
     }
 
     /**
@@ -77,7 +119,7 @@ class SyncManager @Inject constructor(
      * Returns true if more than 1 hour has passed since last sync.
      */
     fun shouldPerformSmartSync(): Boolean {
-        val lastSync = sharedPreferences.getLong(PREF_LAST_SYNC, 0)
+        val lastSync = sharedPreferences.getLong(PreferenceKeys.LAST_SYNC_TIMESTAMP, 0)
         val timeSinceLastSync = System.currentTimeMillis() - lastSync
         return timeSinceLastSync > SMART_SYNC_THRESHOLD_MS
     }
@@ -87,7 +129,23 @@ class SyncManager @Inject constructor(
      * Returns 0 if no sync has been performed yet.
      */
     fun getLastSyncTimestamp(): Long {
-        return sharedPreferences.getLong(PREF_LAST_SYNC, 0)
+        return sharedPreferences.getLong(PreferenceKeys.LAST_SYNC_TIMESTAMP, 0)
+    }
+
+    /**
+     * Gets the list of available Google Calendars.
+     */
+    suspend fun getGoogleCalendarList(): List<com.google.api.services.calendar.model.CalendarListEntry> {
+        val accountEmail = sharedPreferences.getString(PreferenceKeys.GOOGLE_ACCOUNT, null)
+        if (accountEmail != null) {
+            val credentialSet = googleCalendarSync.setCredential(accountEmail)
+            if (!credentialSet) {
+                sharedPreferences.edit().remove(PreferenceKeys.GOOGLE_ACCOUNT).apply()
+                return emptyList()
+            }
+            return googleCalendarSync.getCalendarList()
+        }
+        return emptyList()
     }
 
     /**
@@ -95,7 +153,7 @@ class SyncManager @Inject constructor(
      * Default interval is 6 hours.
      */
     fun schedulePeriodicSync() {
-        val intervalHours = sharedPreferences.getInt(PREF_SYNC_INTERVAL, DEFAULT_SYNC_INTERVAL)
+        val intervalHours = sharedPreferences.getInt(PreferenceKeys.SYNC_INTERVAL_HOURS, DEFAULT_SYNC_INTERVAL)
         
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -125,7 +183,7 @@ class SyncManager @Inject constructor(
      * Gets the list of iCal URLs.
      */
     fun getIcalUrls(): List<String> {
-        return sharedPreferences.getStringSet("ical_urls", emptySet())?.toList() ?: emptyList()
+        return sharedPreferences.getStringSet(PreferenceKeys.ICAL_URLS, emptySet())?.toList() ?: emptyList()
     }
 
     /**
@@ -135,7 +193,7 @@ class SyncManager @Inject constructor(
         val currentUrls = getIcalUrls().toMutableSet()
         currentUrls.add(url)
         sharedPreferences.edit()
-            .putStringSet("ical_urls", currentUrls)
+            .putStringSet(PreferenceKeys.ICAL_URLS, currentUrls)
             .apply()
     }
 
@@ -146,7 +204,23 @@ class SyncManager @Inject constructor(
         val currentUrls = getIcalUrls().toMutableSet()
         currentUrls.remove(url)
         sharedPreferences.edit()
-            .putStringSet("ical_urls", currentUrls)
+            .putStringSet(PreferenceKeys.ICAL_URLS, currentUrls)
+            .apply()
+    }
+
+    /**
+     * Gets the list of selected Google Calendar IDs.
+     */
+    fun getSelectedGoogleCalendars(): List<String> {
+        return sharedPreferences.getStringSet(PreferenceKeys.SELECTED_GOOGLE_CALENDARS, emptySet())?.toList() ?: emptyList()
+    }
+
+    /**
+     * Updates the list of selected Google Calendar IDs.
+     */
+    fun setSelectedGoogleCalendars(calendarIds: List<String>) {
+        sharedPreferences.edit()
+            .putStringSet(PreferenceKeys.SELECTED_GOOGLE_CALENDARS, calendarIds.toSet())
             .apply()
     }
 }

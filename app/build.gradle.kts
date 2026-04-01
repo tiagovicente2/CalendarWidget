@@ -37,6 +37,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     packaging {
         resources {
@@ -94,6 +95,11 @@ dependencies {
     implementation(libs.google.play.services.auth)
     implementation(libs.google.api.client.android)
     implementation(libs.google.api.services.calendar)
+    
+    // Credential Manager
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     // iCal
     implementation(libs.ical4j)

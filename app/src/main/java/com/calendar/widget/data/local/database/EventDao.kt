@@ -30,6 +30,12 @@ interface EventDao {
     @Query("SELECT * FROM events WHERE startTime >= :startDate ORDER BY startTime ASC")
     fun getEventsFromDate(startDate: Long): Flow<List<EventEntity>>
 
+    @androidx.room.Transaction
+    suspend fun replaceEventsForSource(source: String, events: List<EventEntity>) {
+        deleteEventsBySource(source)
+        insertEvents(events)
+    }
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEvent(event: EventEntity)
 

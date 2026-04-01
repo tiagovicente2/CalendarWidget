@@ -33,6 +33,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return context.getSharedPreferences("calendar_widget_prefs", Context.MODE_PRIVATE)
+        return context.getSharedPreferences(com.calendar.widget.data.local.prefs.PreferenceKeys.PREFS_NAME, Context.MODE_PRIVATE)
     }
 }
