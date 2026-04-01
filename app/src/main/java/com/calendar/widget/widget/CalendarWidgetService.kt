@@ -96,17 +96,17 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
         
         if (event.color != 0) {
             try {
-                rv.setInt(R.id.widget_event_color, "setBackgroundColor", event.color)
+                rv.setInt(R.id.widget_event_color, "setColorFilter", event.color)
             } catch (e: Exception) {
-                // Ignore color setting errors
+                com.calendar.widget.util.Logger.e("CalendarWidgetFactory", "Error setting color", e)
             }
         }
         
-        // Setup fill-intent on the whole row
+        // Setup fill-intent on the content layout
         val fillInIntent = Intent().apply {
             putExtra("event_id", event.id)
         }
-        rv.setOnClickFillInIntent(R.id.widget_item_root, fillInIntent)
+        rv.setOnClickFillInIntent(R.id.widget_item_content, fillInIntent)
 
         return rv
     }
