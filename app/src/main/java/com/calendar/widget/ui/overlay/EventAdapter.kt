@@ -8,16 +8,21 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.calendar.widget.data.model.Event
 import java.util.Date
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * RecyclerView adapter for displaying calendar events grouped by day.
  * Supports both day headers and event items with proper Material styling.
  */
-@Singleton
-class EventAdapter @Inject constructor() : 
-    ListAdapter<EventAdapter.ListItem, RecyclerView.ViewHolder>(DiffCallback()) {
+class EventAdapter : ListAdapter<EventAdapter.ListItem, RecyclerView.ViewHolder>(DiffCallback()) {
+
+    private var onEventClickListener: ((Event) -> Unit)? = null
+
+    /**
+     * Sets the click listener for event items.
+     */
+    fun setOnEventClickListener(listener: (Event) -> Unit) {
+        onEventClickListener = listener
+    }
 
     /**
      * Sealed class representing items in the list.
@@ -64,7 +69,7 @@ class EventAdapter @Inject constructor() :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
             is ListItem.DayHeader -> (holder as HeaderViewHolder).bind(item.date, hasEventsBelow(position))
-            is ListItem.EventItem -> (holder as EventViewHolder).bind(item.event)
+            is ListItem.EventItem -> (holder as EventViewHolder).bind(item.event, onEventClickListener)
         }
     }
 
@@ -85,10 +90,10 @@ class EventAdapter @Inject constructor() :
     }
 
     class EventViewHolder(private val view: EventItemView) : RecyclerView.ViewHolder(view) {
-        fun bind(event: Event) {
+        fun bind(event: Event, clickListener: ((Event) -> Unit)?) {
             view.bind(event)
             view.setOnClickListener {
-                // Handle event click - could open event details
+                clickListener?.invoke(event)
             }
         }
     }

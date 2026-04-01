@@ -21,9 +21,8 @@ import hilt_aggregated_deps._androidx_hilt_work_HiltWrapper_WorkerFactoryModule;
 import hilt_aggregated_deps._com_calendar_widget_CalendarWidgetApplication_GeneratedInjector;
 import hilt_aggregated_deps._com_calendar_widget_di_AppModule;
 import hilt_aggregated_deps._com_calendar_widget_di_NetworkModule;
-import hilt_aggregated_deps._com_calendar_widget_service_FloatingCalendarService_GeneratedInjector;
-import hilt_aggregated_deps._com_calendar_widget_ui_config_ConfigActivity_GeneratedInjector;
-import hilt_aggregated_deps._com_calendar_widget_ui_config_WelcomeFragment_GeneratedInjector;
+import hilt_aggregated_deps._com_calendar_widget_ui_detail_EventDetailsActivity_GeneratedInjector;
+import hilt_aggregated_deps._com_calendar_widget_ui_main_MainActivity_GeneratedInjector;
 import hilt_aggregated_deps._dagger_hilt_android_flags_FragmentGetContextFix_FragmentGetContextFixEntryPoint;
 import hilt_aggregated_deps._dagger_hilt_android_flags_HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule;
 import hilt_aggregated_deps._dagger_hilt_android_internal_lifecycle_DefaultViewModelFactories_ActivityEntryPoint;
@@ -68,9 +67,8 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
         _com_calendar_widget_CalendarWidgetApplication_GeneratedInjector.class,
         _com_calendar_widget_di_AppModule.class,
         _com_calendar_widget_di_NetworkModule.class,
-        _com_calendar_widget_service_FloatingCalendarService_GeneratedInjector.class,
-        _com_calendar_widget_ui_config_ConfigActivity_GeneratedInjector.class,
-        _com_calendar_widget_ui_config_WelcomeFragment_GeneratedInjector.class,
+        _com_calendar_widget_ui_detail_EventDetailsActivity_GeneratedInjector.class,
+        _com_calendar_widget_ui_main_MainActivity_GeneratedInjector.class,
         _dagger_hilt_android_flags_FragmentGetContextFix_FragmentGetContextFixEntryPoint.class,
         _dagger_hilt_android_flags_HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class,
         _dagger_hilt_android_internal_lifecycle_DefaultViewModelFactories_ActivityEntryPoint.class,

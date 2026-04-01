@@ -18,14 +18,12 @@ import com.calendar.widget.di.NetworkModule_ProvideIcalServiceFactory;
 import com.calendar.widget.di.NetworkModule_ProvideOkHttpClientFactory;
 import com.calendar.widget.di.NetworkModule_ProvideRetrofitFactory;
 import com.calendar.widget.parser.IcalParser;
-import com.calendar.widget.service.FloatingCalendarService;
-import com.calendar.widget.service.FloatingCalendarService_MembersInjector;
 import com.calendar.widget.sync.GoogleCalendarSync;
 import com.calendar.widget.sync.IcalSync;
 import com.calendar.widget.sync.SyncManager;
-import com.calendar.widget.ui.config.ConfigActivity;
-import com.calendar.widget.ui.config.WelcomeFragment;
-import com.calendar.widget.ui.overlay.EventAdapter;
+import com.calendar.widget.ui.detail.EventDetailsActivity;
+import com.calendar.widget.ui.main.MainActivity;
+import com.calendar.widget.ui.main.MainActivity_MembersInjector;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -330,10 +328,6 @@ public final class DaggerCalendarWidgetApplication_HiltComponents_SingletonC {
     }
 
     @Override
-    public void injectWelcomeFragment(WelcomeFragment welcomeFragment) {
-    }
-
-    @Override
     public DefaultViewModelFactories.InternalFactoryFactory getHiltInternalFactoryFactory() {
       return activityCImpl.getHiltInternalFactoryFactory();
     }
@@ -379,7 +373,12 @@ public final class DaggerCalendarWidgetApplication_HiltComponents_SingletonC {
     }
 
     @Override
-    public void injectConfigActivity(ConfigActivity configActivity) {
+    public void injectEventDetailsActivity(EventDetailsActivity eventDetailsActivity) {
+    }
+
+    @Override
+    public void injectMainActivity(MainActivity mainActivity) {
+      injectMainActivity2(mainActivity);
     }
 
     @Override
@@ -405,6 +404,13 @@ public final class DaggerCalendarWidgetApplication_HiltComponents_SingletonC {
     @Override
     public ViewComponentBuilder viewComponentBuilder() {
       return new ViewCBuilder(singletonCImpl, activityRetainedCImpl, activityCImpl);
+    }
+
+    @CanIgnoreReturnValue
+    private MainActivity injectMainActivity2(MainActivity instance) {
+      MainActivity_MembersInjector.injectEventRepository(instance, singletonCImpl.eventRepositoryProvider.get());
+      MainActivity_MembersInjector.injectSyncManager(instance, singletonCImpl.syncManagerProvider.get());
+      return instance;
     }
   }
 
@@ -502,28 +508,12 @@ public final class DaggerCalendarWidgetApplication_HiltComponents_SingletonC {
 
 
     }
-
-    @Override
-    public void injectFloatingCalendarService(FloatingCalendarService floatingCalendarService) {
-      injectFloatingCalendarService2(floatingCalendarService);
-    }
-
-    @CanIgnoreReturnValue
-    private FloatingCalendarService injectFloatingCalendarService2(
-        FloatingCalendarService instance) {
-      FloatingCalendarService_MembersInjector.injectEventAdapter(instance, singletonCImpl.eventAdapterProvider.get());
-      FloatingCalendarService_MembersInjector.injectEventRepository(instance, singletonCImpl.eventRepositoryProvider.get());
-      FloatingCalendarService_MembersInjector.injectSyncManager(instance, singletonCImpl.syncManagerProvider.get());
-      return instance;
-    }
   }
 
   private static final class SingletonCImpl extends CalendarWidgetApplication_HiltComponents.SingletonC {
     private final ApplicationContextModule applicationContextModule;
 
     private final SingletonCImpl singletonCImpl = this;
-
-    private dagger.internal.Provider<EventAdapter> eventAdapterProvider;
 
     private dagger.internal.Provider<AppDatabase> provideAppDatabaseProvider;
 
@@ -555,18 +545,17 @@ public final class DaggerCalendarWidgetApplication_HiltComponents_SingletonC {
 
     @SuppressWarnings("unchecked")
     private void initialize(final ApplicationContextModule applicationContextModuleParam) {
-      this.eventAdapterProvider = DoubleCheck.provider(new SwitchingProvider<EventAdapter>(singletonCImpl, 0));
-      this.provideAppDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<AppDatabase>(singletonCImpl, 3));
-      this.provideEventDaoProvider = DoubleCheck.provider(new SwitchingProvider<EventDao>(singletonCImpl, 2));
-      this.eventRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<EventRepository>(singletonCImpl, 1));
-      this.googleCalendarSyncProvider = DoubleCheck.provider(new SwitchingProvider<GoogleCalendarSync>(singletonCImpl, 5));
-      this.provideOkHttpClientProvider = DoubleCheck.provider(new SwitchingProvider<OkHttpClient>(singletonCImpl, 9));
-      this.provideRetrofitProvider = DoubleCheck.provider(new SwitchingProvider<Retrofit>(singletonCImpl, 8));
-      this.provideIcalServiceProvider = DoubleCheck.provider(new SwitchingProvider<IcalService>(singletonCImpl, 7));
-      this.icalParserProvider = DoubleCheck.provider(new SwitchingProvider<IcalParser>(singletonCImpl, 10));
-      this.icalSyncProvider = DoubleCheck.provider(new SwitchingProvider<IcalSync>(singletonCImpl, 6));
-      this.provideSharedPreferencesProvider = DoubleCheck.provider(new SwitchingProvider<SharedPreferences>(singletonCImpl, 11));
-      this.syncManagerProvider = DoubleCheck.provider(new SwitchingProvider<SyncManager>(singletonCImpl, 4));
+      this.provideAppDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<AppDatabase>(singletonCImpl, 2));
+      this.provideEventDaoProvider = DoubleCheck.provider(new SwitchingProvider<EventDao>(singletonCImpl, 1));
+      this.eventRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<EventRepository>(singletonCImpl, 0));
+      this.googleCalendarSyncProvider = DoubleCheck.provider(new SwitchingProvider<GoogleCalendarSync>(singletonCImpl, 4));
+      this.provideOkHttpClientProvider = DoubleCheck.provider(new SwitchingProvider<OkHttpClient>(singletonCImpl, 8));
+      this.provideRetrofitProvider = DoubleCheck.provider(new SwitchingProvider<Retrofit>(singletonCImpl, 7));
+      this.provideIcalServiceProvider = DoubleCheck.provider(new SwitchingProvider<IcalService>(singletonCImpl, 6));
+      this.icalParserProvider = DoubleCheck.provider(new SwitchingProvider<IcalParser>(singletonCImpl, 9));
+      this.icalSyncProvider = DoubleCheck.provider(new SwitchingProvider<IcalSync>(singletonCImpl, 5));
+      this.provideSharedPreferencesProvider = DoubleCheck.provider(new SwitchingProvider<SharedPreferences>(singletonCImpl, 10));
+      this.syncManagerProvider = DoubleCheck.provider(new SwitchingProvider<SyncManager>(singletonCImpl, 3));
     }
 
     @Override
@@ -603,40 +592,37 @@ public final class DaggerCalendarWidgetApplication_HiltComponents_SingletonC {
       @Override
       public T get() {
         switch (id) {
-          case 0: // com.calendar.widget.ui.overlay.EventAdapter 
-          return (T) new EventAdapter();
-
-          case 1: // com.calendar.widget.data.repository.EventRepository 
+          case 0: // com.calendar.widget.data.repository.EventRepository 
           return (T) new EventRepository(singletonCImpl.provideEventDaoProvider.get());
 
-          case 2: // com.calendar.widget.data.local.database.EventDao 
+          case 1: // com.calendar.widget.data.local.database.EventDao 
           return (T) AppModule_ProvideEventDaoFactory.provideEventDao(singletonCImpl.provideAppDatabaseProvider.get());
 
-          case 3: // com.calendar.widget.data.local.database.AppDatabase 
+          case 2: // com.calendar.widget.data.local.database.AppDatabase 
           return (T) AppModule_ProvideAppDatabaseFactory.provideAppDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 4: // com.calendar.widget.sync.SyncManager 
+          case 3: // com.calendar.widget.sync.SyncManager 
           return (T) new SyncManager(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.eventRepositoryProvider.get(), singletonCImpl.googleCalendarSyncProvider.get(), singletonCImpl.icalSyncProvider.get(), singletonCImpl.provideSharedPreferencesProvider.get());
 
-          case 5: // com.calendar.widget.sync.GoogleCalendarSync 
+          case 4: // com.calendar.widget.sync.GoogleCalendarSync 
           return (T) new GoogleCalendarSync(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 6: // com.calendar.widget.sync.IcalSync 
+          case 5: // com.calendar.widget.sync.IcalSync 
           return (T) new IcalSync(singletonCImpl.provideIcalServiceProvider.get(), singletonCImpl.icalParserProvider.get());
 
-          case 7: // com.calendar.widget.data.remote.api.IcalService 
+          case 6: // com.calendar.widget.data.remote.api.IcalService 
           return (T) NetworkModule_ProvideIcalServiceFactory.provideIcalService(singletonCImpl.provideRetrofitProvider.get());
 
-          case 8: // retrofit2.Retrofit 
+          case 7: // retrofit2.Retrofit 
           return (T) NetworkModule_ProvideRetrofitFactory.provideRetrofit(singletonCImpl.provideOkHttpClientProvider.get());
 
-          case 9: // okhttp3.OkHttpClient 
+          case 8: // okhttp3.OkHttpClient 
           return (T) NetworkModule_ProvideOkHttpClientFactory.provideOkHttpClient();
 
-          case 10: // com.calendar.widget.parser.IcalParser 
+          case 9: // com.calendar.widget.parser.IcalParser 
           return (T) new IcalParser();
 
-          case 11: // android.content.SharedPreferences 
+          case 10: // android.content.SharedPreferences 
           return (T) AppModule_ProvideSharedPreferencesFactory.provideSharedPreferences(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           default: throw new AssertionError(id);

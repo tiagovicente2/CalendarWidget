@@ -10,11 +10,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <permission
         android:name="com.calendar.widget.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
@@ -34,7 +32,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CalendarWidget" >
         <activity
-            android:name="com.calendar.widget.ui.config.ConfigActivity"
+            android:name="com.calendar.widget.ui.main.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.CalendarWidget" >
             <intent-filter>
@@ -43,12 +41,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name="com.calendar.widget.service.FloatingCalendarService"
-            android:enabled="true"
+        <activity
+            android:name="com.calendar.widget.ui.detail.EventDetailsActivity"
             android:exported="false"
-            android:foregroundServiceType="dataSync" />
+            android:theme="@style/Theme.CalendarWidget" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"

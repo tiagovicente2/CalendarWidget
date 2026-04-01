@@ -3,9 +3,8 @@ package com.calendar.widget;
 import androidx.hilt.work.HiltWrapper_WorkerFactoryModule;
 import com.calendar.widget.di.AppModule;
 import com.calendar.widget.di.NetworkModule;
-import com.calendar.widget.service.FloatingCalendarService_GeneratedInjector;
-import com.calendar.widget.ui.config.ConfigActivity_GeneratedInjector;
-import com.calendar.widget.ui.config.WelcomeFragment_GeneratedInjector;
+import com.calendar.widget.ui.detail.EventDetailsActivity_GeneratedInjector;
+import com.calendar.widget.ui.main.MainActivity_GeneratedInjector;
 import dagger.Binds;
 import dagger.Component;
 import dagger.Module;
@@ -150,8 +149,7 @@ public final class CalendarWidgetApplication_HiltComponents {
 
   @Subcomponent
   @ServiceScoped
-  public abstract static class ServiceC implements FloatingCalendarService_GeneratedInjector,
-      ServiceComponent,
+  public abstract static class ServiceC implements ServiceComponent,
       GeneratedComponent {
     @Subcomponent.Builder
     abstract interface Builder extends ServiceComponentBuilder {
@@ -185,7 +183,8 @@ public final class CalendarWidgetApplication_HiltComponents {
       }
   )
   @ActivityScoped
-  public abstract static class ActivityC implements ConfigActivity_GeneratedInjector,
+  public abstract static class ActivityC implements EventDetailsActivity_GeneratedInjector,
+      MainActivity_GeneratedInjector,
       ActivityComponent,
       DefaultViewModelFactories.ActivityEntryPoint,
       HiltWrapper_HiltViewModelFactory_ActivityCreatorEntryPoint,
@@ -222,8 +221,7 @@ public final class CalendarWidgetApplication_HiltComponents {
       modules = ViewWithFragmentCBuilderModule.class
   )
   @FragmentScoped
-  public abstract static class FragmentC implements WelcomeFragment_GeneratedInjector,
-      FragmentComponent,
+  public abstract static class FragmentC implements FragmentComponent,
       DefaultViewModelFactories.FragmentEntryPoint,
       ViewComponentManager.ViewWithFragmentComponentBuilderEntryPoint,
       GeneratedComponent {

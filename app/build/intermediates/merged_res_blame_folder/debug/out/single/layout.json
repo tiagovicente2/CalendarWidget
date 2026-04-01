@@ -1,7 +1,15 @@
 [
     {
+        "merged": "com.calendar.widget.app-mergeDebugResources-44:/layout/activity_main.xml",
+        "source": "com.calendar.widget.app-main-47:/layout/activity_main.xml"
+    },
+    {
         "merged": "com.calendar.widget.app-mergeDebugResources-44:/layout/fragment_welcome.xml",
         "source": "com.calendar.widget.app-main-47:/layout/fragment_welcome.xml"
+    },
+    {
+        "merged": "com.calendar.widget.app-mergeDebugResources-44:/layout/activity_event_details.xml",
+        "source": "com.calendar.widget.app-main-47:/layout/activity_event_details.xml"
     },
     {
         "merged": "com.calendar.widget.app-mergeDebugResources-44:/layout/activity_config.xml",
@@ -14,9 +22,5 @@
     {
         "merged": "com.calendar.widget.app-mergeDebugResources-44:/layout/item_day_header.xml",
         "source": "com.calendar.widget.app-main-47:/layout/item_day_header.xml"
-    },
-    {
-        "merged": "com.calendar.widget.app-mergeDebugResources-44:/layout/overlay_container.xml",
-        "source": "com.calendar.widget.app-main-47:/layout/overlay_container.xml"
     }
 ]
