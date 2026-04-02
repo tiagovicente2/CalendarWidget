@@ -43,6 +43,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.calendar.widget.util.Logger.d("SettingsActivity", "onCreate")
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -56,6 +57,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupGoogleCalendarList() {
+        com.calendar.widget.util.Logger.d("SettingsActivity", "setupGoogleCalendarList")
         googleCalendarAdapter = GoogleCalendarAdapter { calendarId, isSelected ->
             val currentSelected = syncManager.getSelectedGoogleCalendars().toMutableSet()
             if (isSelected) {
@@ -72,10 +74,13 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun fetchGoogleCalendars() {
-        if (getSavedGoogleAccount() != null) {
+        val account = getSavedGoogleAccount()
+        com.calendar.widget.util.Logger.d("SettingsActivity", "fetchGoogleCalendars. Account: $account")
+        if (account != null) {
             lifecycleScope.launch {
                 try {
                     val calendars = syncManager.getGoogleCalendarList()
+                    com.calendar.widget.util.Logger.d("SettingsActivity", "Fetched ${calendars.size} calendars")
                     if (calendars.isNotEmpty()) {
                         googleCalendarAdapter.submitList(calendars)
                         googleCalendarAdapter.setSelectedIds(syncManager.getSelectedGoogleCalendars())
@@ -83,9 +88,10 @@ class SettingsActivity : AppCompatActivity() {
                         binding.recyclerGoogleCalendars.visibility = android.view.View.VISIBLE
                     }
                 } catch (e: com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException) {
+                    com.calendar.widget.util.Logger.w("SettingsActivity", "UserRecoverableAuthIOException during fetch")
                     // Handled in triggerSync or manual click
                 } catch (e: Exception) {
-                    android.util.Log.e("SettingsActivity", "Error fetching calendars", e)
+                    com.calendar.widget.util.Logger.e("SettingsActivity", "Error fetching calendars", e)
                 }
             }
         } else {
@@ -121,9 +127,11 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.btnGoogleSignOut.setOnClickListener {
-            saveGoogleAccount(null)
-            updateGoogleSignInUi(null)
-            Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show()
+            lifecycleScope.launch {
+                syncManager.clearAllData()
+                updateGoogleSignInUi(null)
+                Toast.makeText(this@SettingsActivity, "Disconnected and data cleared", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
