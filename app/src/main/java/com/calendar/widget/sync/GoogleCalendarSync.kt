@@ -33,13 +33,11 @@ class GoogleCalendarSync @Inject constructor(
         val allAccounts = accountManager.accounts
         Logger.d("GoogleCalendarSync", "All visible accounts: ${allAccounts.joinToString { "${it.name} (${it.type})" }}")
         
-        val account = allAccounts.find { it.name == accountName && it.type == "com.google" }
+        var account = allAccounts.find { it.name == accountName && it.type == "com.google" }
         
         if (account == null) {
-            Logger.e("GoogleCalendarSync", "Account $accountName not found in device AccountManager. " +
-                "User needs to add this account to the device first.")
-            calendarService = null
-            return false
+            Logger.w("GoogleCalendarSync", "Account $accountName not found in visible accounts, creating manually")
+            account = android.accounts.Account(accountName, "com.google")
         }
 
         val credential = GoogleAccountCredential.usingOAuth2(
