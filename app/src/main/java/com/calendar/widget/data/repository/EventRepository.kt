@@ -58,6 +58,10 @@ class EventRepository @Inject constructor(
         eventDao.deleteOldEvents(cutoffDate)
     }
 
+    suspend fun clearAllEvents() {
+        eventDao.deleteAllEvents()
+    }
+
     private fun EventEntity.toDomainModel(): Event {
         return Event(
             id = id,
