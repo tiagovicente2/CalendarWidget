@@ -27,6 +27,10 @@ class EventRepository @Inject constructor(
             .map { it.toDomainModel() }
     }
 
+    suspend fun getEventById(eventId: String): Event? {
+        return eventDao.getEventById(eventId)?.toDomainModel()
+    }
+
     fun getEventsFromDate(startDate: Long): Flow<List<Event>> {
         return eventDao.getEventsFromDate(startDate)
             .map { entities -> entities.map { it.toDomainModel() } }
