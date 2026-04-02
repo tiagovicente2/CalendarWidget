@@ -9,6 +9,9 @@ import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.CalendarScopes
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -122,16 +125,33 @@ class GoogleCalendarSync @Inject constructor(
         val end = googleEvent.end
         
         val isAllDay = start.date != null
-        val startTime = if (isAllDay) {
-            start.date?.value ?: return null
+        val startTime: Long
+        val endTime: Long
+
+        if (isAllDay) {
+            // For all-day events, Google returns a date string (YYYY-MM-DD).
+            // We need to parse this into a local midnight timestamp to avoid timezone shifts.
+            val dateStr = start.date.toStringRfc3339() // Returns "YYYY-MM-DD"
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            sdf.timeZone = java.util.TimeZone.getDefault()
+            val parsedDate = try {
+                sdf.parse(dateStr)
+            } catch (e: Exception) {
+                null
+            }
+            startTime = parsedDate?.time ?: start.date.value
+            
+            // For end date, it's exclusive (the day after the event ends)
+            val endDateStr = end.date.toStringRfc3339()
+            val parsedEndDate = try {
+                sdf.parse(endDateStr)
+            } catch (e: Exception) {
+                null
+            }
+            endTime = parsedEndDate?.time ?: end.date.value
         } else {
-            start.dateTime?.value ?: return null
-        }
-        
-        val endTime = if (isAllDay) {
-            end.date?.value ?: (startTime + 86400000)
-        } else {
-            end.dateTime?.value ?: (startTime + 3600000)
+            startTime = start.dateTime.value
+            endTime = end.dateTime?.value ?: (startTime + 3600000)
         }
 
         val color = if (googleEvent.colorId != null) {
