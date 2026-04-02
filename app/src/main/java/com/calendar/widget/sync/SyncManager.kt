@@ -50,8 +50,6 @@ class SyncManager @Inject constructor(
             val credentialSet = googleCalendarSync.setCredential(accountEmail)
             if (!credentialSet) {
                 Logger.w("SyncManager", "Failed to set credentials for $accountEmail")
-                // Clear saved account since it's no longer valid on this device
-                sharedPreferences.edit().remove(PreferenceKeys.GOOGLE_ACCOUNT).apply()
                 return@withContext
             }
             
@@ -140,12 +138,26 @@ class SyncManager @Inject constructor(
         if (accountEmail != null) {
             val credentialSet = googleCalendarSync.setCredential(accountEmail)
             if (!credentialSet) {
-                sharedPreferences.edit().remove(PreferenceKeys.GOOGLE_ACCOUNT).apply()
                 return emptyList()
             }
             return googleCalendarSync.getCalendarList()
         }
         return emptyList()
+    }
+
+    /**
+     * Clears all local data, including events and preferences.
+     * Used when signing out.
+     */
+    suspend fun clearAllData() {
+        eventRepository.clearAllEvents()
+        sharedPreferences.edit()
+            .remove(PreferenceKeys.GOOGLE_ACCOUNT)
+            .remove(PreferenceKeys.SELECTED_GOOGLE_CALENDARS)
+            .apply()
+        
+        // Notify widget to update (to show empty state)
+        com.calendar.widget.widget.CalendarAppWidgetProvider.sendRefreshBroadcast(context)
     }
 
     /**
