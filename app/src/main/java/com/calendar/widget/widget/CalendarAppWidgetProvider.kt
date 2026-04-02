@@ -52,18 +52,22 @@ class CalendarAppWidgetProvider : AppWidgetProvider() {
             views.setRemoteAdapter(R.id.widget_list_view, intent)
             views.setEmptyView(R.id.widget_list_view, R.id.widget_empty_view)
 
-            // Intent to launch MainActivity when clicking the title
-            val titleIntent = Intent(context, MainActivity::class.java)
-            val titlePendingIntent = PendingIntent.getActivity(
+            // Intent to launch MainActivity when clicking the empty view
+            val mainIntent = Intent(context, MainActivity::class.java)
+            val mainPendingIntent = PendingIntent.getActivity(
                 context, 
                 0, 
-                titleIntent, 
+                mainIntent, 
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            views.setOnClickPendingIntent(R.id.widget_title, titlePendingIntent)
+            views.setOnClickPendingIntent(R.id.widget_empty_view, mainPendingIntent)
 
             // Setup a template intent for list items click handling (handled by RemoteViewsFactory)
-            val clickIntentTemplate = Intent(context, MainActivity::class.java)
+            // We use MainActivity as the template so that headers can just open the app, 
+            // while events will pass extras that MainActivity will use to launch details.
+            val clickIntentTemplate = Intent(context, MainActivity::class.java).apply {
+                action = "com.calendar.widget.WIDGET_CLICK"
+            }
             val flags = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             } else {

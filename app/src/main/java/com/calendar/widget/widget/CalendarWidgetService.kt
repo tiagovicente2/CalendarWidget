@@ -115,6 +115,10 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
                     rv.setViewVisibility(R.id.widget_header_month, View.GONE)
                 }
                 rv.setTextViewText(R.id.widget_header_day, dayFormat.format(item.date))
+                
+                // Clicking header opens the app (MainActivity)
+                val fillInIntent = Intent()
+                rv.setOnClickFillInIntent(R.id.widget_header_root, fillInIntent)
                 rv
             }
             is WidgetListItem.EventItem -> {
@@ -142,9 +146,17 @@ class CalendarWidgetFactory(private val context: Context) : RemoteViewsService.R
                 }
                 
                 val fillInIntent = Intent().apply {
-                    putExtra("event_id", event.id)
+                    putExtra(com.calendar.widget.ui.detail.EventDetailsActivity.EXTRA_EVENT_ID, event.id)
+                    putExtra(com.calendar.widget.ui.detail.EventDetailsActivity.EXTRA_EVENT_TITLE, event.title)
+                    putExtra(com.calendar.widget.ui.detail.EventDetailsActivity.EXTRA_EVENT_START, event.startTime)
+                    putExtra(com.calendar.widget.ui.detail.EventDetailsActivity.EXTRA_EVENT_END, event.endTime)
+                    putExtra(com.calendar.widget.ui.detail.EventDetailsActivity.EXTRA_EVENT_LOCATION, event.location)
+                    putExtra(com.calendar.widget.ui.detail.EventDetailsActivity.EXTRA_EVENT_DESCRIPTION, event.description)
+                    putExtra(com.calendar.widget.ui.detail.EventDetailsActivity.EXTRA_EVENT_ALL_DAY, event.isAllDay)
+                    putExtra(com.calendar.widget.ui.detail.EventDetailsActivity.EXTRA_EVENT_COLOR, event.color)
+                    putExtra(com.calendar.widget.ui.detail.EventDetailsActivity.EXTRA_EVENT_SOURCE, event.calendarSource)
                 }
-                rv.setOnClickFillInIntent(R.id.widget_item_content, fillInIntent)
+                rv.setOnClickFillInIntent(R.id.widget_event_item_root, fillInIntent)
                 rv
             }
         }
