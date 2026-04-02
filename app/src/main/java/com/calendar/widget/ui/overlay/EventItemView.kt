@@ -31,6 +31,13 @@ class EventItemView @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.item_event, this, true)
         orientation = LinearLayout.HORIZONTAL
         
+        // Add selectable background for ripple effect
+        val attrs = intArrayOf(android.R.attr.selectableItemBackground)
+        val typedArray = context.obtainStyledAttributes(attrs)
+        val selectableBackground = typedArray.getDrawable(0)
+        background = selectableBackground
+        typedArray.recycle()
+        
         titleText = findViewById(R.id.event_title)
         detailsText = findViewById(R.id.event_details)
         colorBar = findViewById(R.id.event_color_bar)
