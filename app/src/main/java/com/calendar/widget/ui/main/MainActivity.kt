@@ -59,6 +59,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Logger.d("MainActivity", "onCreate called")
+        
+        handleIntent(intent)
+        
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -74,6 +77,26 @@ class MainActivity : AppCompatActivity() {
         
         Logger.d("MainActivity", "Checking sign in")
         checkGoogleSignIn()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        val eventId = intent.getStringExtra(EventDetailsActivity.EXTRA_EVENT_ID)
+        Logger.d("MainActivity", "handleIntent: eventId=$eventId")
+        if (eventId != null) {
+            val detailIntent = Intent(this, EventDetailsActivity::class.java).apply {
+                // Forward all extras
+                putExtras(intent)
+                // Ensure we don't stack multiple detail views
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }
+            startActivity(detailIntent)
+        }
     }
 
     private fun checkGoogleSignIn() {
